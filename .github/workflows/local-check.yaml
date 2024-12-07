@@ -1,0 +1,76 @@
+name: Compila con CMake, lint e docs generation
+
+on:
+  push:
+    branches:
+      - "dev"
+      - "main"
+  pull_request:
+    branches:
+      - "dev"
+      - "main"
+jobs:
+
+  lint:
+    runs-on: self-hosted
+    steps:
+      - run: pip install cpplint
+      - run: cpplint --recursive .
+
+  cppcheck:
+    runs-on: self-hosted
+    steps:
+      - run: >
+        cppcheck -q
+        --language=c++
+        --template=gcc
+        --std=c++11
+        --enable=all
+        --inline-suppr
+        #--suppress=unmatchedSuppression
+        --suppress=unusedFunction
+        --suppress=missingInclude
+        ${{ github.workspace }}
+
+  build:
+    needs:
+      - lint   #se ci sono errori non provo nemmeno a buildare
+      - cppcheck
+    runs-on: self-hosted
+    #TODO: va controllato che ogni volta che questo workflow parte, le cartelel di destinazione vengono azzerate o i file persistono
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set reusable strings
+        # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+        id: strings
+        shell: bash
+        run: |
+            echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+      - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+        run: >
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}
+          -DCMAKE_CXX_COMPILER=${{ g++ }}
+          -DCMAKE_C_COMPILER=${{ gcc }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -S ${{ github.workspace }}
+
+      - name: Build
+        # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+      - name: Test
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
+        # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+        run: ctest --build-config Release
+
+  documentation:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - run: doxygen --version
+      - run: doxygen docs/Doxyfile
+      - run: mv docs/out/html public
