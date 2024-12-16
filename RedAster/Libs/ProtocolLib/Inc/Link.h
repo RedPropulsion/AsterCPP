@@ -11,10 +11,12 @@
 class Link{
 
 protected:
-    HAL_StatusTypeDef status;
-    Mode modeTransmit;
+    HAL_StatusTypeDef status {HAL_OK};
+    Mode modeTransmit {};
 
 public:
+
+    explicit Link(Mode mode_transmit) : modeTransmit(mode_transmit) {}
     virtual ~Link() = default;
 
     virtual void Transmit() = 0;
