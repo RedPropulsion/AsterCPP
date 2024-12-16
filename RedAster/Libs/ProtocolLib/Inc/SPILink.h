@@ -37,10 +37,7 @@
 class SPILink : public Link{
 public:
     SPILink(SPIChannel& channel, GPIO_TypeDef* csPort, uint16_t csPin, Mode modeTransmit)
-        : spiChannel(channel), csPort(csPort), csPin(csPin) {
-        status = HAL_OK;
-        modeTransmit = modeTransmit;
-    }
+        : spiChannel(channel), csPort(csPort), csPin(csPin), Link(modeTransmit) {}
 
     /*
      * @brief: Allow to transmit data to the e2e connection
@@ -48,9 +45,9 @@ public:
      *
      * @retval: HAL status.
      */
-    HAL_StatusTypeDef Transmit(std::vector<uint8_t> &buffer);
+    [[nodiscard]]HAL_StatusTypeDef Transmit(std::vector<uint8_t> &buffer);
+    [[nodiscard]]HAL_StatusTypeDef Receive(std::vector<uint8_t> &buffer);
 
-    //TODO Receive
     //TODO TransmitReceive
 
 private:
@@ -61,7 +58,5 @@ private:
     void selectChip() const;
     void deselectChip() const;
 };
-
-
 
 #endif //SPILINK_H
