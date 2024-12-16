@@ -46,9 +46,23 @@ public:
      * @retval: HAL status.
      */
     [[nodiscard]]HAL_StatusTypeDef Transmit(std::vector<uint8_t> &buffer);
+
+    /*
+     * @brief: Allow to receive data from the e2e connection
+     * @param: Buffer to store received data.
+     *
+     * @retval: HAL status.
+     */
     [[nodiscard]]HAL_StatusTypeDef Receive(std::vector<uint8_t> &buffer);
 
-    //TODO TransmitReceive
+    /*
+     * @brief: Transmit and receive data from the e2e connection
+     * @param: Buffer to transmit.
+     * @param: Buffer to store received data.
+     *
+     * @retval: HAL status.
+     */
+    [[nodiscard]]HAL_StatusTypeDef TransmitReceive(std::vector<uint8_t>& TX_buffer, std::vector<uint8_t>& RX_buffer);
 
 private:
     SPIChannel& spiChannel;
