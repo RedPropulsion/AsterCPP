@@ -17,6 +17,7 @@ Follow the next steps to build the project with CMake on any platform.
   macOS:
   ```
   brew install arm-none-eabi-gcc
+  brew install gcc-arm-embedded
   ```
   Linux:
   ```

@@ -1,1 +1,8 @@
 .settings/
+cmake-build-debug/
+
+language.settings.xml
+docs/out
+
+#
+.idea/
