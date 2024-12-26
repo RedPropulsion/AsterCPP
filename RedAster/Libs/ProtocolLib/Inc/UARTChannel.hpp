@@ -27,6 +27,15 @@ public:
     [[nodiscard]]HAL_StatusTypeDef Receive(Identity role, Mode transmit_mode, std::vector<uint8_t>& buffer) const;
 
 private:
+
+    void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart);
+    void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef* huart);
+
+    void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart);
+    void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef* huart);
+
+    void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart);
+
     std::unique_ptr<UART_HandleTypeDef> handler;
     uint32_t polling_timeout;
 };
