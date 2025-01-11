@@ -6,7 +6,7 @@
 #define SPILINK_H
 
 
-#include "Link.h"
+#include "Link.hpp"
 #include "SPIChannel.hpp"
 
 /*
@@ -22,10 +22,6 @@
  * - HAL library.
  * - SPIChannel.hpp.
  *
- * Notes:
- * - Methods for receiving (Receive) and bidirectional transmission (TransmitReceive) are not
- *   yet implemented (marked as TODO).
- *
  * Usage example:
  *
  * SPIChannel channel(&handler, 10);
@@ -37,10 +33,7 @@
 class SPILink : public Link{
 public:
     SPILink(SPIChannel& channel, GPIO_TypeDef* csPort, uint16_t csPin, Mode modeTransmit)
-        : spiChannel(channel), csPort(csPort), csPin(csPin) {
-        status = HAL_OK;
-        modeTransmit = modeTransmit;
-    }
+        : spiChannel(channel), csPort(csPort), csPin(csPin), Link(Identity::N_A, modeTransmit) {}
 
     /*
      * @brief: Allow to transmit data to the e2e connection
@@ -48,10 +41,24 @@ public:
      *
      * @retval: HAL status.
      */
-    HAL_StatusTypeDef Transmit(std::vector<uint8_t> &buffer);
+    [[nodiscard]]HAL_StatusTypeDef Transmit(std::vector<uint8_t> &buffer) override;
 
-    //TODO Receive
-    //TODO TransmitReceive
+    /*
+     * @brief: Allow to receive data from the e2e connection
+     * @param: Buffer to store received data.
+     *
+     * @retval: HAL status.
+     */
+    [[nodiscard]]HAL_StatusTypeDef Receive(std::vector<uint8_t> &buffer) override;
+
+    /*
+     * @brief: Transmit and receive data from the e2e connection
+     * @param: Buffer to transmit.
+     * @param: Buffer to store received data.
+     *
+     * @retval: HAL status.
+     */
+    [[nodiscard]]HAL_StatusTypeDef TransmitReceive(std::vector<uint8_t>& TX_buffer, std::vector<uint8_t>& RX_buffer);
 
 private:
     SPIChannel& spiChannel;
@@ -61,7 +68,5 @@ private:
     void selectChip() const;
     void deselectChip() const;
 };
-
-
 
 #endif //SPILINK_H
