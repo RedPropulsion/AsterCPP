@@ -22,7 +22,7 @@
 class Sensor {
 
 protected:
-    Link& link;
+    std::shared_ptr<Link> link;
 
     /*
      * @brief: read/write some data from/on the physical sensor, all communications with it should be implemented with
@@ -37,7 +37,7 @@ protected:
     virtual HAL_StatusTypeDef writeData(uint8_t reg, uint8_t data) = 0;
 
 public:
-    explicit Sensor(Link& link): link(link) { }
+    explicit Sensor(Link& link): link(&link) { }
     virtual ~Sensor() = default;
 
     /*
