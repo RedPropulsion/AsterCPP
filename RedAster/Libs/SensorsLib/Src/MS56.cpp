@@ -33,6 +33,7 @@ HAL_StatusTypeDef MS56::writeData(const uint8_t reg, uint8_t data) {
 HAL_StatusTypeDef MS56::init() {
     HAL_GPIO_WritePin(GPIOC, PIN, GPIO_PIN_RESET); // activate MS56 bus interface
     HAL_StatusTypeDef comStatus = writeData(Register::RESET_REG, 0);
+    // TODO add delay functionality to Link class
     HAL_Delay(2);
     HAL_GPIO_WritePin(GPIOC, PIN, GPIO_PIN_RESET); // deactivate MS56 bus interface
     return comStatus;

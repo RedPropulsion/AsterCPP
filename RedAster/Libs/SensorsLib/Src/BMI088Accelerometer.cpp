@@ -157,6 +157,9 @@ HAL_StatusTypeDef BMI088Accelerometer::setRange(Range range) {
   return writeData(RegisterAddress::RANGE, range);
 }
 
+/*
+ * @brief write abstract sensor configuration into real sensor
+ */
 HAL_StatusTypeDef BMI088Accelerometer::setConfig() {
   HAL_StatusTypeDef comStatus = writeData(RegisterAddress::PWR_CNF, 0x00);
   if (comStatus != HAL_OK) {
@@ -183,6 +186,9 @@ HAL_StatusTypeDef BMI088Accelerometer::setConfig() {
   return comStatus;
 }
 
+/*
+ * @brief read sensor value
+ */
 vec3s16 BMI088Accelerometer::getMeasure() const{
   std::vector<uint8_t> buffer;
   HAL_StatusTypeDef comStatus = readData(RegisterAddress::X_LSB, buffer);
@@ -198,6 +204,9 @@ vec3s16 BMI088Accelerometer::getMeasure() const{
   };
 }
 
+/*
+ * @brief starts softreset procedure
+ */
 HAL_StatusTypeDef BMI088Accelerometer::softReset() {
   HAL_StatusTypeDef comStatus = writeData(RegisterAddress::SOFTERESET, SOFTRESET_COMM);
   HAL_Delay(1);
