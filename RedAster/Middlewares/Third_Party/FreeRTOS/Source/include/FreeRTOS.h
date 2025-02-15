@@ -976,7 +976,7 @@ if floating point hardware is otherwise supported by the FreeRTOS port in use.
 This constant is not supported by all FreeRTOS ports that include floating
 point support. */
 #ifndef configUSE_TASK_FPU_SUPPORT
-	#define configUSE_TASK_FPU_SUPPORT 2
+	#define configUSE_TASK_FPU_SUPPORT 1
 #endif
 
 /* Set configENABLE_MPU to 1 to enable MPU support and 0 to disable it. This is
