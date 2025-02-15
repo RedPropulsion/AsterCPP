@@ -2306,13 +2306,12 @@ void StartDefaultTask(void *argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
-  uint8_t psiello[] = "CANE DIO";
+  uint8_t buffer_tx[] = "The Serial Port Is Working\r\n";
   /* Infinite loop */
   for(;;)
   {
-    HAL_UART_Transmit(&huart3, psiello, sizeof(psiello), 100);
-
-    osDelay(1);
+    HAL_UART_Transmit(&huart3, buffer_tx, sizeof(buffer_tx), 1000);
+    osDelay(100);
   }
   /* USER CODE END 5 */
 }
