@@ -18,26 +18,51 @@ extern "C" {
 #include "Utils.hpp"
 
 class UARTChannel {
-public:
+  public:
 
-    explicit UARTChannel(UART_HandleTypeDef init, uint32_t polling_timeout = 0)
-    : handler(std::make_unique<UART_HandleTypeDef>(init)), polling_timeout(polling_timeout) {};
+  explicit UARTChannel(UART_HandleTypeDef init, uint32_t timeout_tx = 100, uint32_t timeout_rx = 10000)
+      : handler(std::make_unique<UART_HandleTypeDef>(init)), timeout_tx(timeout_tx), timeout_rx(timeout_rx) {};
 
-    [[nodiscard]]HAL_StatusTypeDef Transmit(Identity role, Mode transmit_mode, std::vector<uint8_t>& buffer) const;
-    [[nodiscard]]HAL_StatusTypeDef Receive(Identity role, Mode transmit_mode, std::vector<uint8_t>& buffer) const;
+  /*
+   * @brief: Allow to transmit in non-blocking and polling mode implementing the two methods given by the HAL.
+   *         The protocol use DMA when transmits in non-blocking mode.
+   * @param: Buffer containing the strings to transmit.
+   * @param: Specify if non-blocking or polling mode as transmission mode.
+   *
+   * @retval: HAL status.
+   */
+  [[nodiscard]]HAL_StatusTypeDef transmit(std::vector<std::string> &buffer, Mode transmit_mode) const;
 
-private:
+  /*
+  * @brief: Allow reception in non-blocking and polling mode implementing the two methods given by the HAL.
+  *         The protocol use DMA when receives in non-blocking mode.
+  * @param: Buffer to store the data received as strings.
+  * @param: Specify if non-blocking or polling mode as reception mode.
+  *
+  * @retval: HAL status.
+  */
+  [[nodiscard]]HAL_StatusTypeDef receive(std::vector<std::string> &buffer, Mode transmit_mode) const;
 
-    void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart);
-    void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef* huart);
+  private:
 
-    void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart);
-    void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef* huart);
+  /*
+   * Callbacks used by the non-blocking modes of the above methods. The name specifies which event call them as the
+   * interrupt raised by the transmit/receive method comes.
+   *
+  */
+  void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);
 
-    void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart);
+  void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart);
 
-    std::unique_ptr<UART_HandleTypeDef> handler;
-    uint32_t polling_timeout;
+  void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+
+  void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart);
+
+  void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);
+
+  std::unique_ptr<UART_HandleTypeDef> handler;
+  uint32_t timeout_tx;
+  uint32_t timeout_rx;
 };
 
 #endif //REDASTER_UARTCHANNEL_HPP
