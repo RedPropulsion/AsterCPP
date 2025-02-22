@@ -4,31 +4,23 @@
 
 #include "SPILink.hpp"
 
-HAL_StatusTypeDef SPILink::Transmit(std::vector<uint8_t> &buffer) {
-    selectChip();
-    status = spiChannel.Transmit(id, modeTransmit, buffer);
-    deselectChip();
-    return status;
+HAL_StatusTypeDef SPILink::transmit(std::vector<uint8_t> &buffer) {
+  HAL_GPIO_WritePin(&csPort, csPin, GPIO_PIN_SET);
+  status = spiChannel.transmit(buffer, modeTransmit);
+  HAL_GPIO_WritePin(&csPort, csPin, GPIO_PIN_SET);
+  return status;
 }
 
-HAL_StatusTypeDef SPILink::Receive(std::vector<uint8_t> &buffer) {
-    selectChip();
-    status = spiChannel.Receive(id, modeTransmit, buffer);
-    deselectChip();
-    return status;
+HAL_StatusTypeDef SPILink::receive(std::vector<uint8_t> &buffer) {
+  HAL_GPIO_WritePin(&csPort, csPin, GPIO_PIN_SET);
+  status = spiChannel.receive(buffer, modeTransmit);
+  HAL_GPIO_WritePin(&csPort, csPin, GPIO_PIN_SET);
+  return status;
 }
 
-HAL_StatusTypeDef SPILink::TransmitReceive(std::vector<uint8_t> &TX_buffer, std::vector<uint8_t> &RX_buffer) {
-    selectChip();
-    status = spiChannel.TransmitReceive(id, modeTransmit, TX_buffer, RX_buffer);
-    deselectChip();
-    return status;
-}
-
-void SPILink::selectChip() const{
-    HAL_GPIO_WritePin(csPort, csPin, GPIO_PIN_RESET);   // CS low
-}
-
-void SPILink::deselectChip() const{
-    HAL_GPIO_WritePin(csPort, csPin, GPIO_PIN_SET);     // CS high
+HAL_StatusTypeDef SPILink::transmit_receive(std::vector<uint8_t> &TX_buffer, std::vector<uint8_t> &RX_buffer) {
+  HAL_GPIO_WritePin(&csPort, csPin, GPIO_PIN_SET);
+  status = spiChannel.transmit_receive(TX_buffer, RX_buffer, modeTransmit);
+  HAL_GPIO_WritePin(&csPort, csPin, GPIO_PIN_SET);
+  return status;
 }

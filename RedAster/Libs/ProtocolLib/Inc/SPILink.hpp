@@ -32,7 +32,7 @@
  */
 class SPILink : public Link{
 public:
-    SPILink(SPIChannel& channel, GPIO_TypeDef* csPort, uint16_t csPin, Mode modeTransmit)
+    SPILink(SPIChannel& channel, GPIO_TypeDef csPort, uint16_t csPin, Mode modeTransmit)
         : spiChannel(channel), csPort(csPort), csPin(csPin), Link(Identity::N_A, modeTransmit) {}
 
     /*
@@ -41,7 +41,7 @@ public:
      *
      * @retval: HAL status.
      */
-    [[nodiscard]]HAL_StatusTypeDef Transmit(std::vector<uint8_t> &buffer) override;
+    HAL_StatusTypeDef transmit(std::vector<uint8_t> &buffer) override;
 
     /*
      * @brief: Allow to receive data from the e2e connection
@@ -49,7 +49,7 @@ public:
      *
      * @retval: HAL status.
      */
-    [[nodiscard]]HAL_StatusTypeDef Receive(std::vector<uint8_t> &buffer) override;
+    HAL_StatusTypeDef receive(std::vector<uint8_t> &buffer) override;
 
     /*
      * @brief: Transmit and receive data from the e2e connection
@@ -58,15 +58,12 @@ public:
      *
      * @retval: HAL status.
      */
-    [[nodiscard]]HAL_StatusTypeDef TransmitReceive(std::vector<uint8_t>& TX_buffer, std::vector<uint8_t>& RX_buffer);
+    HAL_StatusTypeDef transmit_receive(std::vector<uint8_t>& TX_buffer, std::vector<uint8_t>& RX_buffer);
 
 private:
     SPIChannel& spiChannel;
-    GPIO_TypeDef* csPort;
+    GPIO_TypeDef csPort;
     uint16_t csPin;
-
-    void selectChip() const;
-    void deselectChip() const;
 };
 
 #endif //SPILINK_H

@@ -4,58 +4,57 @@
 
 #include "SPIChannel.hpp"
 
+HAL_StatusTypeDef SPIChannel::transmit(std::vector<uint8_t> &buffer, Mode transmit_mode) const {
 
-HAL_StatusTypeDef SPIChannel::Transmit(Identity role, Mode transmit_mode, std::vector<uint8_t> &buffer) const {
+  HAL_StatusTypeDef status;
 
-    HAL_StatusTypeDef status;
+  if (HAL_SPI_GetState(handler.get()) == HAL_SPI_STATE_READY) {
 
-    if (role == Identity::N_A && transmit_mode == Mode::POLLING)
-        status = HAL_SPI_Transmit(handler.get(), get_valid_ptr(buffer), size_in_byte(buffer), polling_t);
-
-    else if (role == Identity::N_A && transmit_mode == Mode::NON_BLOCKING)
-        status = HAL_SPI_Transmit_DMA(handler.get(), get_valid_ptr(buffer), size_in_byte(buffer));
+    if (transmit_mode == Mode::POLLING)
+      status = HAL_SPI_Transmit(handler.get(), buffer.data(), buffer.size() * sizeof(uint8_t), timeout_tx);
 
     else
-        status = HAL_ERROR;
-        //throw std::logic_error("Non-valid identity for the SPI Transmit operation");
+      status = HAL_SPI_Transmit_DMA(handler.get(), buffer.data(), buffer.size() * sizeof(uint8_t));
 
-    return status;
+  } else status = HAL_ERROR;
+
+  return status;
 }
 
-HAL_StatusTypeDef SPIChannel::Receive(Identity role, Mode receive_mode, std::vector<uint8_t> &buffer) {
+HAL_StatusTypeDef SPIChannel::receive(std::vector<uint8_t> &buffer, Mode receive_mode) {
 
-    HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status;
 
-    if (role == Identity::N_A && receive_mode == Mode::POLLING)
-        status = HAL_SPI_Receive(handler.get(), get_valid_ptr(buffer), size_in_byte(buffer), polling_t);
+  if (HAL_SPI_GetState(handler.get()) == HAL_SPI_STATE_READY) {
 
-    else if (role == Identity::N_A && receive_mode == Mode::NON_BLOCKING)
-        status = HAL_SPI_Receive_DMA(handler.get(), get_valid_ptr(buffer), size_in_byte(buffer));
+    buffer.resize(sData);
+
+    if (receive_mode == Mode::POLLING)
+      status = HAL_SPI_Receive(handler.get(), buffer.data(), buffer.size() * sizeof(uint8_t), timeout_rx);
 
     else
-        status = HAL_ERROR;
-        //throw std::logic_error("Non-valid identity for the SPI Transmit operation");
+      status = HAL_SPI_Receive_DMA(handler.get(), buffer.data(), buffer.size() * sizeof(uint8_t));
 
-    return status;
+  } else status = HAL_ERROR;
+
+  return status;
 }
 
-HAL_StatusTypeDef SPIChannel::TransmitReceive(Identity role, Mode transmit_receive_mode, std::vector<uint8_t> &TX_buffer, std::vector<uint8_t> &RX_buffer) {
+HAL_StatusTypeDef SPIChannel::transmit_receive(std::vector<uint8_t> &buffer_tx, std::vector<uint8_t> &buffer_rx, Mode transmit_receive_mode) {
 
-    HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status;
 
-    if (size_in_byte(TX_buffer) == size_in_byte(RX_buffer))
+  if (HAL_SPI_GetState(handler.get()) == HAL_SPI_STATE_READY) {
 
-        if (role == Identity::N_A && transmit_receive_mode == Mode::POLLING)
-            status = HAL_SPI_TransmitReceive(handler.get(), get_valid_ptr(TX_buffer), get_valid_ptr(RX_buffer),size_in_byte(TX_buffer), polling_t);
+    buffer_rx.resize(buffer_tx.size());
 
-        else if (role == Identity::N_A && transmit_receive_mode == Mode::NON_BLOCKING)
-            status = HAL_SPI_TransmitReceive_DMA(handler.get(), get_valid_ptr(TX_buffer), get_valid_ptr(RX_buffer),size_in_byte(TX_buffer));
+    if (transmit_receive_mode == Mode::POLLING)
+      status = HAL_SPI_TransmitReceive(handler.get(), buffer_tx.data(), buffer_rx.data(),buffer_rx.size() * sizeof(uint8_t), timeout_rx);
 
-        else
-            status = HAL_ERROR;
-            //throw std::logic_error("Non-valid identity for the SPI Transmit operation");
     else
-        status = HAL_ERROR;
+      status = HAL_SPI_TransmitReceive_DMA(handler.get(), buffer_tx.data(), buffer_rx.data(),buffer_rx.size() * sizeof(uint8_t));
 
-    return status;
+  } else status = HAL_ERROR;
+
+  return status;
 }

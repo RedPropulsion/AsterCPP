@@ -18,38 +18,37 @@ extern "C" {
 #include "Utils.hpp"
 
 class SPIChannel {
-public:
-    explicit SPIChannel(SPI_HandleTypeDef init, uint32_t polling_timeout = 0) : handler(
-            std::make_unique<SPI_HandleTypeDef>(init)), polling_t(polling_timeout) {}
+  public:
+  explicit SPIChannel(SPI_HandleTypeDef init, const uint32_t sData = 32, uint32_t timeout_tx = 1000, uint32_t timeout_rx = 10000) :
+      handler(std::make_unique<SPI_HandleTypeDef>(init)), timeout_rx(timeout_rx), timeout_tx(timeout_tx), sData(sData) {}
 
-    /*
-     * @brief: Allow to transmit in non-blocking and polling mode implementing the two methods given by the HAL.
-     *         The protocol use DMA when transmits in non-blocking mode.
-     * @param: This param MUST be set as N_A, otherwise throw an exception.
-     * @param: Specify if non-blocking or polling mode as transmission mode.
-     * @param: Buffer to transmit.
-     *
-     * @retval: HAL status.
-     */
-    HAL_StatusTypeDef Transmit(Identity role, Mode transmit_mode, std::vector<uint8_t> &buffer) const;
+  /*
+   * @brief: Allow to transmit in non-blocking and polling mode implementing the two methods given by the HAL.
+   *         The protocol use DMA when transmits in non-blocking mode.
+   * @param: Buffer to transmit.
+   * @param: Specify if non-blocking or polling mode as transmission mode.
+   *
+   * @retval: HAL status.
+   */
+  HAL_StatusTypeDef transmit(std::vector<uint8_t> &buffer, Mode transmit_mode) const;
 
-    /*
-     * @brief: Allow reception in non-blocking and polling mode implementing the two methods given by the HAL.
-     *         The protocol use DMA when receives in non-blocking mode.
-     * @param: This param MUST be set as N_A, otherwise throw an exception.
-     * @param: Specify if non-blocking or polling mode as reception mode.
-     * @param: Buffer to store the data received.
-     *
-     * @retval: HAL status.
-     */
-    HAL_StatusTypeDef Receive(Identity role, Mode receive_mode, std::vector<uint8_t> &buffer);
+  /*
+   * @brief: Allow reception in non-blocking and polling mode implementing the two methods given by the HAL.
+   *         The protocol use DMA when receives in non-blocking mode.
+   * @param: Buffer to store the data received. The data are stored in chunks of sData size.
+   * @param: Specify if non-blocking or polling mode as reception mode.
+   *
+   * @retval: HAL status.
+   */
+  HAL_StatusTypeDef receive(std::vector<uint8_t> &buffer, Mode receive_mode);
 
-    HAL_StatusTypeDef TransmitReceive(Identity role, Mode transmit_receive_mode, std::vector<uint8_t> &TX_buffer,
-                                      std::vector<uint8_t> &RX_buffer);
+  HAL_StatusTypeDef transmit_receive(std::vector<uint8_t> &buffer_tx, std::vector<uint8_t> &buffer_rx, Mode transmit_receive_mode);
 
-private:
-    std::unique_ptr<SPI_HandleTypeDef> handler;
-    uint32_t polling_t;
+  private:
+  std::unique_ptr<SPI_HandleTypeDef> handler;
+  uint32_t timeout_rx;
+  uint32_t timeout_tx;
+  const uint32_t sData;         //Size of the buffer that store the raw data
 };
 
 
