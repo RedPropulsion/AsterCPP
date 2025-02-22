@@ -41,7 +41,7 @@ class UARTChannel {
   *
   * @retval: HAL status.
   */
-  [[nodiscard]]HAL_StatusTypeDef receive(std::vector<std::string> &buffer, Mode transmit_mode) const;
+  [[nodiscard]]HAL_StatusTypeDef receive(std::vector<std::string> &buffer, Mode receive_mode) const;
 
   private:
 
