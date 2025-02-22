@@ -7,15 +7,19 @@ HAL_StatusTypeDef UARTChannel::transmit(std::vector<std::string> &buffer, Mode t
 
   HAL_StatusTypeDef status;
 
-  if (transmit_mode == Mode::POLLING)
-    for (auto &i: buffer) {
-      status = HAL_UART_Transmit(handler.get(), reinterpret_cast<const uint8_t *>(i.c_str()),i.size() * sizeof(uint8_t), timeout_tx);
-    }
-  else
-    for (auto &i: buffer) {
-      //FIXME: there are still problems in assigning the correct DMA stream to the USART3_TX and USART_RX. Needs correction in the .ioc .
-      status = HAL_UART_Transmit_DMA(handler.get(), reinterpret_cast<const uint8_t *>(i.c_str()),i.size() * sizeof(uint8_t));
-    }
+  if (HAL_UART_GetState(handler.get()) == HAL_UART_STATE_READY) {
+
+    if (transmit_mode == Mode::POLLING)
+      for (auto &i: buffer) {
+        status = HAL_UART_Transmit(handler.get(), reinterpret_cast<const uint8_t *>(i.c_str()),i.size() * sizeof(uint8_t), timeout_tx);
+      }
+    else
+      for (auto &i: buffer) {
+        //FIXME: there are still problems in assigning the correct DMA stream to the USART3_TX and USART_RX. Needs correction in the .ioc .
+        status = HAL_UART_Transmit_DMA(handler.get(), reinterpret_cast<const uint8_t *>(i.c_str()),i.size() * sizeof(uint8_t));
+      }
+
+  } else status = HAL_ERROR;
 
   return status;
 }
@@ -23,27 +27,31 @@ HAL_StatusTypeDef UARTChannel::transmit(std::vector<std::string> &buffer, Mode t
 HAL_StatusTypeDef UARTChannel::receive(std::vector<std::string> &buffer, Mode receive_mode) const {
 
   HAL_StatusTypeDef status;
-  const int fixed_size = 64;
-  uint8_t temp_store[fixed_size] = {"\0"};     // UART.receive works only with uint_8 fixed size arrays to store data.
-                                               // In order to create a uniform interface we store the raw data in an
-                                               // uint_8 array, and then we create a string where the raw data are
-                                               // appended. After that, the string is pushed inside the buffer vector.
-                                               // At the end of the acquisition, the buffer has some strings, one for
-                                               // every receiving session.
-  std::string merged_values;
 
-  if (receive_mode == Mode::POLLING)
-    status = HAL_UART_Receive(handler.get(), temp_store, sizeof(temp_store), timeout_rx);
-  else
-    //FIXME: there are still problems in assigning the correct DMA stream to the USART3_TX and USART_RX. Needs correction in the .ioc .
-    status = HAL_UART_Receive_DMA(handler.get(), temp_store, sizeof(temp_store));
+  if (HAL_UART_GetState(handler.get()) == HAL_UART_STATE_READY) {
 
-  for (unsigned char i: temp_store) {
-    if (i == 0)                                 // When the char "\0" is found it means that stream of data is ended.
-      break;
-    merged_values.push_back(i);
-  }
-  buffer.push_back(merged_values);
+    uint8_t temp_store[sData] = {"\0"};     // UART.receive works only with uint_8 fixed size arrays to store data.
+                                            // In order to create a uniform interface we store the raw data in an
+                                            // uint_8 array, and then we create a string where the raw data are
+                                            // appended. After that, the string is pushed inside the buffer vector.
+                                            // At the end of the acquisition, the buffer has some strings, one for
+                                            // every receiving session.
+    std::string merged_values;
+
+    if (receive_mode == Mode::POLLING)
+      status = HAL_UART_Receive(handler.get(), temp_store, sizeof(temp_store), timeout_rx);
+    else
+      //FIXME: there are still problems in assigning the correct DMA stream to the USART3_TX and USART_RX. Needs correction in the .ioc .
+      status = HAL_UART_Receive_DMA(handler.get(), temp_store, sizeof(temp_store));
+
+    for (unsigned char i: temp_store) {
+      if (i == 0) break;                             // When the char "\0" is found it means that stream of data is ended.
+      merged_values.push_back(i);
+    }
+
+    buffer.push_back(merged_values);
+
+  } else status = HAL_ERROR;
 
   return status;
 }

@@ -20,8 +20,8 @@ extern "C" {
 class UARTChannel {
   public:
 
-  explicit UARTChannel(UART_HandleTypeDef init, uint32_t timeout_tx = 100, uint32_t timeout_rx = 10000)
-      : handler(std::make_unique<UART_HandleTypeDef>(init)), timeout_tx(timeout_tx), timeout_rx(timeout_rx) {};
+  explicit UARTChannel(UART_HandleTypeDef init, const uint32_t sData = 64, uint32_t timeout_tx = 100, uint32_t timeout_rx = 10000) :
+  handler(std::make_unique<UART_HandleTypeDef>(init)), timeout_tx(timeout_tx), timeout_rx(timeout_rx), sData(sData) {};
 
   /*
    * @brief: Allow to transmit in non-blocking and polling mode implementing the two methods given by the HAL.
@@ -31,7 +31,7 @@ class UARTChannel {
    *
    * @retval: HAL status.
    */
-  [[nodiscard]]HAL_StatusTypeDef transmit(std::vector<std::string> &buffer, Mode transmit_mode) const;
+  HAL_StatusTypeDef transmit(std::vector<std::string> &buffer, Mode transmit_mode) const;
 
   /*
   * @brief: Allow reception in non-blocking and polling mode implementing the two methods given by the HAL.
@@ -41,7 +41,7 @@ class UARTChannel {
   *
   * @retval: HAL status.
   */
-  [[nodiscard]]HAL_StatusTypeDef receive(std::vector<std::string> &buffer, Mode receive_mode) const;
+  HAL_StatusTypeDef receive(std::vector<std::string> &buffer, Mode receive_mode) const;
 
   private:
 
@@ -63,6 +63,7 @@ class UARTChannel {
   std::unique_ptr<UART_HandleTypeDef> handler;
   uint32_t timeout_tx;
   uint32_t timeout_rx;
+  const uint32_t sData;                 //Size of the buffer that store the raw data
 };
 
 #endif //REDASTER_UARTCHANNEL_HPP
