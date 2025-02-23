@@ -33,7 +33,7 @@
 class SPILink : public Link{
 public:
     SPILink(SPIChannel& channel, GPIO_TypeDef csPort, uint16_t csPin, Mode modeTransmit)
-        : spiChannel(channel), csPort(csPort), csPin(csPin), Link(Identity::N_A, modeTransmit) {}
+        : spiChannel(channel), csPort(csPort), csPin(csPin), Link(modeTransmit) {}
 
     /*
      * @brief: Allow to transmit data to the e2e connection
