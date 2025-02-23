@@ -19,7 +19,7 @@ extern "C" {
 
 class SPIChannel {
   public:
-  explicit SPIChannel(SPI_HandleTypeDef init, const uint32_t sData = 32, uint32_t timeout_tx = 1000, uint32_t timeout_rx = 10000) :
+  explicit SPIChannel(SPI_HandleTypeDef init, uint32_t sData = 32, uint32_t timeout_tx = 100, uint32_t timeout_rx = 100) :
       handler(std::make_unique<SPI_HandleTypeDef>(init)), timeout_rx(timeout_rx), timeout_tx(timeout_tx), sData(sData) {}
 
   /*
