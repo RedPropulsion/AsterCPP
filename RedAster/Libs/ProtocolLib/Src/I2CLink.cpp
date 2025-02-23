@@ -3,18 +3,16 @@
 //
 #include "I2CLink.hpp"
 
-HAL_StatusTypeDef I2CLink::Transmit(std::vector<uint8_t> &buffer) {
-    select_address(buffer);
-    status = i2c_channel.Transmit(id, modeTransmit, buffer);
-    return status;
+HAL_StatusTypeDef I2CLink::transmit(std::vector<uint8_t> &buffer) {
+  buffer.insert(buffer.begin(), target_reg);
+  status = i2c_channel.transmit(chip_address, buffer, modeTransmit, id);
+  buffer.erase(buffer.begin());
+  return status;
 }
 
-HAL_StatusTypeDef I2CLink::Receive(std::vector<uint8_t> &buffer) {
-    select_address(buffer);
-    status = i2c_channel.Receive(id, modeTransmit, buffer);
-    return status;
-}
-
-void I2CLink::select_address(std::vector<uint8_t>& buffer) const {
-    buffer.insert(buffer.begin(),address);
+HAL_StatusTypeDef I2CLink::receive(std::vector<uint8_t> &buffer) {
+  buffer.insert(buffer.begin(), target_reg);
+  status = i2c_channel.receive(chip_address, buffer, modeTransmit, id);
+  buffer.erase(buffer.begin());
+  return status;
 }
