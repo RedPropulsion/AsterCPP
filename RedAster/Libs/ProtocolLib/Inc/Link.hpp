@@ -12,16 +12,15 @@ class Link{
 
 protected:
     HAL_StatusTypeDef status {HAL_OK};
-    Identity id;
     Mode modeTransmit;
 
 public:
 
-    explicit Link(Identity id, Mode mode_transmit) : id(id), modeTransmit(mode_transmit) {}
+    explicit Link(Mode mode_transmit) : modeTransmit(mode_transmit) {}
     virtual ~Link() = default;
 
-    virtual HAL_StatusTypeDef Transmit(std::vector<uint8_t>& buffer) = 0;
-    virtual HAL_StatusTypeDef Receive(std::vector<uint8_t>& buffer) = 0;
+    virtual HAL_StatusTypeDef transmit(std::vector<uint8_t>& buffer) = 0;
+    virtual HAL_StatusTypeDef receive(std::vector<uint8_t>& buffer) = 0;
 };
 
 #endif // LINK_HPP
