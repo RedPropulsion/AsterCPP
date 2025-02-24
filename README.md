@@ -5,7 +5,8 @@ Follow the next steps to build the project with CMake on any platform.
 ### Requirements:
 
 * __CMake Version__:
-   The project requires the 3.28 minimum version for CMake, so make sure to have the right version installed. To check the version:
+   The project requires the 3.28 minimum version for CMake, so make sure to have the right version installed. To check 
+the version:
    ```
    cmake --version
    ```
@@ -17,17 +18,16 @@ Follow the next steps to build the project with CMake on any platform.
   macOS:
   ```
   brew install arm-none-eabi-gcc
-  brew install gcc-arm-embedded
   ```
   Linux(Debian-based):
   ```
   sudo apt-get install arm-none-eabi-gcc
   ```
-  Linux(RHEL-based)
+  Linux(RHEL-based):
   ```
   sudo dnf install arm-none-eabi-gcc arm-none-eabi-g++
   ```
-  Windows
+  Windows:
   ```
   choco install gcc-arm-embedded
   ```
@@ -41,8 +41,55 @@ cmake -S . -B build # use the current directory as source dir and create build
 cmake --build build # compiles the project in the build folder
 ```
 
-# Come usare questa repo:
+# Debug RedAster in CLion
 
-- Lavora nel tuo branch e fai pull request?
-- altro
-- inoltre
+Follow the next steps to debug the project with CLion.
+
+### Requirements:
+
+* __Open OCD__:
+   First of all you have to have installed Open OCD (Open On-Chip Debugger), an open-source utility to debug microcontrollers.
+   It can be installed through a package manager:
+   
+   macOS:
+   ```
+   brew install open-ocd
+   ```
+  Linux:
+   ```
+   sudo apt-get install openocd
+   ```
+  Windows:
+   ```
+   choco install openocd
+   ```
+* __GDB__:
+   Make sure to have installed GDB (GNU Debugger). It can be installed through a package manager:
+
+   macOS:
+   ```
+   brew install gdb
+   ```
+   Linux:
+   ```
+   sudo apt-get install gdb
+   ```
+   Windows:
+   Follow the instructions on this page: [MinGW System](https://sourceforge.net/projects/mingw/files/MinGW/).
+
+### Create the CLion Configuration:
+Follow the next steps to debug your code inside CLion:
+
+1. Go in the settings and set the Embedded Development specifications.
+2. Create a new configuration for your build. Make sure is an "OpenOCD Download & Run" type of configuration.
+   
+   <p align="center">
+       <img width = "700" src=".read-me-assets/EmbeddedDevConfig.png" alt="EmbeddedDevConfig" style="margin-top:20px; margin-bottom:20px;">
+   </p>
+   
+3. Now fill the settings with as "Target and Executable binary" the RedAster.elf . Then as "Board config file" specify 
+   the path of the "custom_st_nucleo_h723ZG.cfg" present in the repo.
+   
+   <p align="center">
+       <img width = "700" src=".read-me-assets/CLionConfig.png" alt="CLionConfig" style="margin-top:20px; margin-bottom:20px;">
+   </p>
