@@ -9,30 +9,26 @@
 #define INC_QUEUE_H_
 
 #include <iostream>
+#include <vector>
+#include <stdexcept>
 
 template <typename T>
 class Queue {
 private:
-    T* data;        // Array dinamico per memorizzare gli elementi della coda
-    int front;      // Indice dell'elemento in testa alla coda
-    int rear;       // Indice dell'ultimo elemento nella coda
-    int capacity;   // Capacità massima dell'array
-    int size;       // Numero di elementi attualmente nella coda
-
-    void resize();  // Metodo privato per ridimensionare l'array quando è pieno
+    std::vector<T> data;        // Queue with std::vector
 
 public:
     Queue();
     ~Queue();
 
     void enqueue(const T& value);
-    void dequeue();
-    T peek() const;
-    bool isEmpty() const;
-    int getSize() const;
-    void printQueue() const;
+    T dequeue();                // dequeue and return the element (FIFO)
+    T front() const;            // return front element
+    bool isEmpty() const;       // check if the queue is empty
+    size_t getSize() const;
+
 };
 
-#include "queue.cpp"  // Inclusione del file .cpp per evitare problemi con i template
+#include "queue.cpp"
 
 #endif /* INC_QUEUE_H_ */
